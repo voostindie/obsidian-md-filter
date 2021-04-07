@@ -1,0 +1,69 @@
+#!/usr/bin/ruby
+require 'singleton'
+
+Encoding::default_internal = Encoding::UTF_8
+Encoding::default_external = Encoding::UTF_8
+
+class Vault
+  include Singleton
+
+  def invalid?
+    ENV['MARKED_PATH'].nil? || !@root.nil?
+  end
+
+  def resolve(reference)
+    Dir.chdir(root) do
+      files = Dir.glob("**/#{reference}*")
+      if files.size == 1
+        return File.join(root, files[0])
+      end
+      nil
+    end
+  end
+
+  private
+
+  def root
+    @root ||= resolve_root(ENV['MARKED_PATH'])
+  end
+
+  def resolve_root(path)
+    dir = File.dirname(path)
+    if Dir.exist?(File.join(dir, '.obsidian'))
+      dir
+    elsif [Dir.home, '/'].include?(dir)
+      nil
+    else
+      resolve_root(dir)
+    end
+  end
+end
+
+# Don't process if the file is not in an Obsidian vault.
+if Vault.instance.invalid?
+  puts 'NOCUSTOM'
+  return
+end
+
+STDIN.readlines.each do |line|
+
+  # ![[Include This]], on a single line
+  if line =~ /^!\[\[(.*?)\]\]$/ 
+    path = Vault.instance.resolve($1)
+    if path.nil?
+      puts line
+    else
+      puts "/#{path}"
+    end
+
+    next
+  end
+
+  # [[Link|Name]]
+  line.gsub!(/\[\[(.*?)\|(.*?)\]\]/, '\2')
+
+  # [[Link]]
+  line.gsub!(/\[\[(.*?)\]\]/, '\1')
+  
+  puts line
+end
