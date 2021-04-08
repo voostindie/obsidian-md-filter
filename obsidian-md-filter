@@ -7,8 +7,8 @@ Encoding::default_external = Encoding::UTF_8
 class Vault
   include Singleton
 
-  def invalid?
-    ENV['MARKED_PATH'].nil? || !@root.nil?
+  def valid?
+    !ENV['MARKED_PATH'].nil? && !@root.nil?
   end
 
   def resolve(reference)
@@ -40,14 +40,13 @@ class Vault
 end
 
 # Don't process if the file is not in an Obsidian vault.
-if Vault.instance.invalid?
+unless Vault.instance.valid?
   puts 'NOCUSTOM'
   return
 end
 
 STDIN.readlines.each do |line|
-
-  # ![[Include This]], on a single line
+  # ![[Include This]], on a single line -> /path/to/reference
   if line =~ /^!\[\[(.*?)\]\]$/ 
     path = Vault.instance.resolve($1)
     if path.nil?
@@ -55,15 +54,11 @@ STDIN.readlines.each do |line|
     else
       puts "/#{path}"
     end
-
-    next
+  else
+    # [[Internal link|Alias]] -> Alias
+    line.gsub!(/\[\[(.*?)\|(.*?)\]\]/, '\2')
+    # [[Internal link]] -> Internal link
+    line.gsub!(/\[\[(.*?)\]\]/, '\1')
+    puts line
   end
-
-  # [[Link|Name]]
-  line.gsub!(/\[\[(.*?)\|(.*?)\]\]/, '\2')
-
-  # [[Link]]
-  line.gsub!(/\[\[(.*?)\]\]/, '\1')
-  
-  puts line
 end

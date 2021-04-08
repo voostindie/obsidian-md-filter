@@ -1,6 +1,12 @@
 # Obsidian Markdown Filter
 
-Takes an [Obsidian](https://obsidian.md) Markdown file and processes it for viewing in [Marked 2](https://marked2app.com). Set this script as a custom preprocessor in Marked to make it work.
+## Introduction
+
+Takes an [Obsidian](https://obsidian.md) Markdown file and processes it for viewing in [Marked 2](https://marked2app.com). Set this script as a custom preprocessor in Marked 2 to make it work:
+
+![Marked 2 App Settings](marked2-settings-screenshot.png)
+
+## Overview
 
 What does the filter do? The main idea is that the output of the filter is a document that can live on its own, outside of an Obsidian vault. To achieve that, it: 
 
@@ -12,9 +18,9 @@ What does the filter do? The main idea is that the output of the filter is a doc
     
 In case the document being previewed is not in an Obsidian vault, this processor does nothing.
 
-## Some notes on transclusions
+## Transclusions
 
-- A transclusion only works if the instruction is on a single line, all by itself. Obsidian is more flexible, but Marked 2 is not. And I don't want to rewrite the source content too much.
+- A transclusion only works if the instruction is on a single line, all by itself. Obsidian is more flexible, but Marked 2 is not. I don't want to rewrite the source content too much.
 - Transclusions don't work if the referenced file doesn't exist or has multiple matches in the Obsidian vault.
 - Transcluded files are not processed themselves. So, nested transclusion don't work. According to the Marked 2 documentation it should work, but that's not my experience. I haven't looked into it further.
 - I chose to use the IA Writer block syntax for three reasons:
@@ -22,10 +28,12 @@ In case the document being previewed is not in an Obsidian vault, this processor
     2. It works for many different file types.
     3. I use iA Writer myself, next to Obsidian, so I'm familiar with it.
 
-## A note on Obsidian vaults
+## Obsidian vaults
 
-This filter looks for the vault the file being processed is in by locating the `.obsidian` folder in the directory structure, going upward from the current file. 
+This filter looks for the vault the file being processed is in by locating the `.obsidian` directory in the directory structure, going upward from the current file. If this directory can't be found, the file being processed is considered not to be in a vault, in which case the filter does nothing.
 
-Since [version 0.11.13 of Obsidian](https://forum.obsidian.md/t/obsidian-release-v0-11-13/15900) the name of this folder is configurable, per vault. 
+## Resolving internal links
 
-**This filter doesn't support that currently!**
+The way the filter resolves references in `[[internal links]]` is bij globbing for `**/internal links*`, starting from the root of the vault. This is **not** the same as what Obsidian does, but it works perfectly for me, because every one of my files has a name that is unique across the entire vault, allowing me to move files around within the vault without breaking anything.
+
+Your mileage may vary though.
