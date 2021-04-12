@@ -8,7 +8,7 @@ class Vault
   include Singleton
 
   def valid?
-    !ENV['MARKED_PATH'].nil? && !@root.nil?
+    !ENV['MARKED_PATH'].nil? && !root.nil?
   end
 
   def resolve(reference)
