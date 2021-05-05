@@ -57,6 +57,8 @@ STDIN.readlines.each do |line|
   else
     # [[Internal link|Alias]] -> Alias
     line.gsub!(/\[\[(.*?)\|(.*?)\]\]/, '\2')
+    # [[Internal link#Reference]] -> Internal link
+    line.gsub!(/\[\[(.*?)#(.*?)?\]\]/, '\1 > \2')
     # [[Internal link]] -> Internal link
     line.gsub!(/\[\[(.*?)\]\]/, '\1')
     puts line
