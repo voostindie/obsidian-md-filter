@@ -16,6 +16,8 @@ What does the filter do? The main idea is that the output of the filter is a doc
     - `[[Link to other page#Reference]]` becomes `Link to other page > Reference`
 - Replaces transclusions with IA Writer block syntax
     - `![[File to include]]` becomes `/path/to/File to include.extension`
+- Strips all Emoji's from the content, if enabled (see Settings below)
+    - `👨🏻‍💻 Foo bar` becomes `Foo bar`
     
 In case the document being previewed is not in an Obsidian vault, this processor does nothing.
 
@@ -35,6 +37,14 @@ This filter looks for the vault the file being processed is in by locating the `
 
 ## Resolving internal links
 
-The way the filter resolves references in `[[internal links]]` is bij globbing for `**/internal links*`, starting from the root of the vault. This is **not** the same as what Obsidian does, but it works perfectly for me, because every one of my files has a name that is unique across the entire vault, allowing me to move files around within the vault without breaking anything.
+The way the filter resolves references in `[[internal links]]` is by globbing for `**/internal links*`, starting from the root of the vault. This is **not** the same as what Obsidian does, but it works perfectly for me, because every one of my files has a name that is unique across the entire vault, allowing me to move files around within the vault without breaking anything.
 
 Your mileage may vary though.
+
+## Settings
+
+The filter can be configured per-vault by putting a file `.obsidian-md-filter` in the root of the vault. This must be a YAML file. Currently it supports just one setting:
+
+```yaml
+strip_emojis: true
+```
