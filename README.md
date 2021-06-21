@@ -16,6 +16,8 @@ What does the filter do? The main idea is that the output of the filter is a doc
     - `[[Link to other page#Reference]]` becomes `Link to other page > Reference`
 - Replaces transclusions with IA Writer block syntax
     - `![[File to include]]` becomes `/path/to/File to include.extension`
+- Strips all block IDs from the content
+    - `Text ending with ^block-id` becomes `Text ending with`
 - Strips all Emoji's from the content, if enabled (see Settings below)
     - `👨🏻‍💻 Foo bar` becomes `Foo bar`
     
