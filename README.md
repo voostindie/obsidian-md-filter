@@ -10,6 +10,7 @@ Takes an [Obsidian](https://obsidian.md) Markdown file and processes it for view
 
 What does the filter do? The main idea is that the output of the filter is a document that can live on its own, outside of an Obsidian vault. To achieve that, it: 
 
+- Strips out the YAML front matter if present (I can never get it to work reliably in Marked 2 itself)
 - Replaces internal Obsidian links with just the text of the link.
     - `[[Link to other page|Alias]]` becomes `Alias`
     - `[[Link to other page]]` becomes `Link to other page`
