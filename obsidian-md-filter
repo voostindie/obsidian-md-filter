@@ -69,6 +69,7 @@ EMOJI_REGEX = /[\uFE00-\uFE0F\u203C\u2049\u2122\u2139\u2194-\u2199\u21A9-\u21AA\
 
 first = true
 front_matter = false
+comment = false
 $stdin.readlines.each do |line|
   # Strip out the YAML front matter, if any.
   if first
@@ -80,6 +81,13 @@ $stdin.readlines.each do |line|
   end
   if front_matter
     front_matter = false if line.strip == '---'
+    next
+  end
+
+  # Strip out HTML comments
+  comment = true if line.start_with?('<!--')
+  if comment
+    comment = false if line.strip.end_with?('-->')
     next
   end
 
