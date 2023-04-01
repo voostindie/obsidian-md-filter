@@ -10,16 +10,19 @@ Takes an [Obsidian](https://obsidian.md) Markdown file and processes it for view
 
 What does the filter do? The main idea is that the output of the filter is a document that can live on its own, outside of an Obsidian vault. To achieve that, it: 
 
-- Strips out the YAML front matter if present (I can never get it to work reliably in Marked 2 itself)
+- Adds the filename as a level 1 title at the top, if enabled (see Settings below).
+- Strips any YAML front matter (I can never get it to work reliably in Marked 2 itself)
+- Strips HTML comments
 - Replaces internal Obsidian links with just the text of the link.
     - `[[Link to other page|Alias]]` becomes `Alias`
     - `[[Link to other page]]` becomes `Link to other page`
     - `[[Link to other page#Reference]]` becomes `Link to other page > Reference`
+    - `[[#Reference]]` becomes `Reference`
 - Replaces transclusions with IA Writer block syntax
     - `![[File to include]]` becomes `/path/to/File to include.extension`
-- Strips all block IDs from the content
+- Strips block IDs from the content
     - `Text ending with ^block-id` becomes `Text ending with`
-- Strips all Emoji's from the content, if enabled (see Settings below)
+- Strips emojis from the content, if enabled (see Settings below)
     - `👨🏻‍💻 Foo bar` becomes `Foo bar`
     
 In case the document being previewed is not in an Obsidian vault, this processor does nothing.
@@ -46,8 +49,9 @@ Your mileage may vary though.
 
 ## Settings
 
-The filter can be configured per-vault by putting a file `.obsidian-md-filter` in the root of the vault. This must be a YAML file. Currently it supports just one setting:
+The filter can be configured per-vault by putting a file `.obsidian-md-filter` in the root of the vault. This must be a YAML file. Currently it supports two settings:
 
 ```yaml
 strip_emojis: true
+add_title: true
 ```
