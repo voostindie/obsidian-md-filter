@@ -97,7 +97,7 @@ $stdin.readlines.each do |line|
       puts "/#{path}"
     end
   else
-    # Remove emoji's if needed
+    # Remove emojis if needed
     line.gsub!(EMOJI_REGEX, '') if Vault.instance.strip_emojis?
     # Fix all [[WikiLinks]]
     replacements = {}
@@ -110,8 +110,13 @@ $stdin.readlines.each do |line|
                                  # [[Internal link|Alias]] -> Alias
                                  label
                                elsif !anchor.nil?
-                                 # [[Internal link#Reference]] -> Internal link > Reference
-                                 "#{page} > #{anchor}"
+                                 if page.empty?
+                                   # [[#Reference]] -> Reference
+                                   anchor
+                                 else
+                                   # [[Internal link#Reference]] -> Internal link > Reference
+                                   "#{page} > #{anchor}"
+                                 end
                                else
                                  # [[Internal link]] -> Internal link
                                  page
