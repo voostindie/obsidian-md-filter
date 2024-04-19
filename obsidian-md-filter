@@ -1,6 +1,7 @@
 #!/usr/bin/ruby
 require 'singleton'
 require 'yaml'
+require 'erb'
 
 Encoding.default_internal = Encoding::UTF_8
 Encoding.default_external = Encoding::UTF_8
@@ -27,6 +28,10 @@ class Vault
 
   def add_title?
     settings[:add_title]
+  end
+
+  def vault
+    @vault ||= ERB::Util.url_encode(File.basename(root))
   end
 
   private
@@ -104,10 +109,10 @@ $stdin.readlines.each do |line|
   end
 
   # ^block-id on its own line -> skip completely
-  next if line =~ /^\^[a-zA-Z0-9\-]+$/
+  next if line =~ /^\^[a-zA-Z0-9-]+$/
 
   # ^block-id at the end of a line? -> strip off
-  line.gsub!(/^(.*?)\s\^[a-zA-Z0-9\-]+$/, '\1')
+  line.gsub!(/^(.*?)\s\^[a-zA-Z0-9-]+$/, '\1')
   # ![[Include This]], on a single line -> /path/to/reference
   if line =~ /^!\[\[(.*?)\]\]$/
     path = Vault.instance.resolve(Regexp.last_match(1))
@@ -119,29 +124,43 @@ $stdin.readlines.each do |line|
   else
     # Remove emojis if needed
     line.gsub!(EMOJI_REGEX, '') if Vault.instance.strip_emojis?
+    # Style #tags
+    line.gsub!(/(?<=\A|\s)#(\S+)/, '<span class="mkstyledtag">#\1</span>')
     # Fix all [[WikiLinks]]
     replacements = {}
+    vault = Vault.instance.vault
     line.scan(/(\[\[(.*?)\]\])/) do |match|
       wikilink = match[0]
       text = match[1]
       link, label = text.split('|')
       page, anchor = link.split('#')
+
       replacements[wikilink] = if !label.nil?
-                                 # [[Internal link|Alias]] -> Alias
-                                 label
+                                 # [[Internal link|Alias]] -> [Alias](obsidian url)
+                                 "[#{label}](obsidian://vault/#{vault}/#{ERB::Util.url_encode(link)})"
                                elsif !anchor.nil?
                                  if page.empty?
-                                   # [[#Reference]] -> Reference
-                                   anchor
+                                   # [[#A Reference]] -> [A Reference](#a-reference)
+                                   "[#{anchor}](##{anchor.downcase.gsub(/[^a-z0-9%]/i, '-').gsub(/%20/, '-').gsub(/-+/, '-')})"
                                  else
-                                   # [[Internal link#Reference]] -> Internal link > Reference
-                                   "#{page} > #{anchor}"
+                                   # [[Internal link#Reference]] -> [Internal link > Reference](obsidian url to page#anchor)
+                                   "[#{page} > #{anchor}](obsidian://vault/#{vault}/#{ERB::Util.url_encode("#{page}##{anchor}")})"
                                  end
                                else
-                                 # [[Internal link]] -> Internal link
-                                 page
+                                 page = anchor.nil? ? page : "#{page} > #{anchor}"
+                                 "[#{page}](obsidian://vault/#{vault}/#{ERB::Util.url_encode(page)})"
                                end
     end
+    # Match []() style links and convert to Obsidian urls
+    line.scan(/\[(?<label>.*?)\]\((?<note>[^#]+)(?:\.md)?(?<anchor>#.*?)?\)/) do
+      m = Regexp.last_match
+      wikilink = m[0]
+      label = m['label']
+      link = m['note']
+      anchor = m['anchor']
+      replacements[wikilink] = "[#{label}](obsidian://vault/#{vault}/#{ERB::Util.url_encode("#{link}#{anchor}")})"
+    end
+
     replacements.each_pair { |k, v| line.gsub!(k, v) }
     puts line
   end

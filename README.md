@@ -14,10 +14,11 @@ What does the filter do? The main idea is that the output of the filter is a doc
 - Strips any YAML front matter (I can never get it to work reliably in Marked 2 itself)
 - Strips HTML comments
 - Replaces internal Obsidian links with just the text of the link.
-    - `[[Link to other page|Alias]]` becomes `Alias`
-    - `[[Link to other page]]` becomes `Link to other page`
-    - `[[Link to other page#Reference]]` becomes `Link to other page > Reference`
-    - `[[#Reference]]` becomes `Reference`
+    - `[[Link to other page|Alias]]` becomes `[Alias](obsidian url to other page)`
+    - `[[Link to other page]]` becomes `[Link to other page](obsidian url to other page)`
+    - `[[Link to other page#Reference]]` becomes `[Link to other page > Reference](obsidian url to "other page" with anchor)`
+    - `[[#Reference]]` becomes `[Reference](#reference)`. This will only work if the Processor in Marked is set to Discount (GFM).
+- `#tag` gets styled as a tag in Marked Preview
 - Replaces transclusions with IA Writer block syntax
     - `![[File to include]]` becomes `/path/to/File to include.extension`
 - Strips block IDs from the content
