@@ -13,11 +13,18 @@ What does the filter do? The main idea is that the output of the filter is a doc
 - Adds the filename as a level 1 title at the top, if enabled (see Settings below).
 - Strips any YAML front matter (I can never get it to work reliably in Marked 2 itself)
 - Strips HTML comments
-- Replaces internal Obsidian links with just the text of the link.
-    - `[[Link to other page|Alias]]` becomes `Alias`
-    - `[[Link to other page]]` becomes `Link to other page`
-    - `[[Link to other page#Reference]]` becomes `Link to other page > Reference`
-    - `[[#Reference]]` becomes `Reference`
+- Replaces internal Obsidian links with just the text of the link, or with Obsidian links, based on settings.
+    - If `obsidian_links` is set to `true`
+        - `[[Link to other page|Alias]]` becomes `[Alias](obsidian url to other page)`
+        - `[[Link to other page]]` becomes `[Link to other page](obsidian url to other page)`
+        - `[[Link to other page#Reference]]` becomes `[Link to other page > Reference](obsidian url to "other page" with anchor)`
+        - `[[#Reference]]` becomes `[Reference](#reference)`. This will only work if the Processor in Marked is set to Discount (GFM).
+    - If `obsidian_links` is false or not set
+        - `[[Link to other page|Alias]]` becomes `Alias`
+        - `[[Link to other page]]` becomes `Link to other page`
+        - `[[Link to other page#Reference]]` becomes `Link to other page > Reference`
+        - `[[#Reference]]` becomes `Reference`
+- `#tag` gets styled as a tag in Marked Preview
 - Replaces transclusions with IA Writer block syntax
     - `![[File to include]]` becomes `/path/to/File to include.extension`
 - Strips block IDs from the content
@@ -49,9 +56,20 @@ Your mileage may vary though.
 
 ## Settings
 
-The filter can be configured per-vault by putting a file `.obsidian-md-filter` in the root of the vault. This must be a YAML file. Currently it supports two settings:
+The filter can be configured per-vault by putting a file `.obsidian-md-filter` in the root of the vault. This must be a YAML file. Currently it supports the following settings:
 
 ```yaml
 strip_emojis: true
 add_title: true
+convert_tags: true
+obsidian_links: true
+convert_markdown_links: true
+marked_processor: discount
 ```
+
+- `strip_emojis`: remove emojis in the preview
+- `add_title`: include the title of the note as an H1 in the preview 
+- `convert_tags`: convert `#tags` to styled tags in preview
+- `obsidian_links`: if true, links in the document are converted to `obsidian://` urls and will open the linked notes in Obsidian
+- `convert_markdown_links`: if true, links created in the "portable" format (`[label](link)`) will be converted to `obsidian://` links. Only use this if you don't have `[[wikilinks]]` as your default link type
+- `marked_processor`: can be set to `mmd` or `multimarkdown` to remove spaces from the slug (#My anchor => Myanchor), which is compatible with the way MultiMarkdown creates anchors from headlines. Any other value will generate anchors as hyphenated slugs (#My anchor => my-anchor).
