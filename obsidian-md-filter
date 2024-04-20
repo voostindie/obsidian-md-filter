@@ -49,7 +49,7 @@ class Vault
   end
 
   def convert_markdown_links?
-    settings[:obsidian_links]
+    settings[:convert_markdown_links]
   end
 
   def vault
