@@ -8,7 +8,11 @@ Encoding.default_external = Encoding::UTF_8
 
 class ::String
   def slugify
-    downcase.gsub(/%20/, '-').gsub(/[^a-z0-9%]/i, '-').gsub(/-+/, '-')
+    if Vault.instance.mmd?
+      gsub(/%20/, '').gsub(/[^a-z0-9%]/i, '')
+    else
+      downcase.gsub(/%20/, '-').gsub(/[^a-z0-9%]/i, '-').gsub(/-+/, '-')
+    end
   end
 end
 
@@ -52,6 +56,14 @@ class Vault
     @vault ||= ERB::Util.url_encode(File.basename(root))
   end
 
+  def mmd
+    @mmd ||= settings[:marked_processor] =~ /^(mult|mmd)/
+  end
+
+  def mmd?
+    mmd
+  end
+
   private
 
   def root
@@ -84,7 +96,8 @@ class Vault
       add_title: config['add_title'] || false,
       convert_tags: config['convert_tags'] || false,
       obsidian_links: config['obsidian_links'] || false,
-      convert_markdown_links: config['convert_markdown_links'] || false
+      convert_markdown_links: config['convert_markdown_links'] || false,
+      marked_processor: config['marked_processor'].downcase || 'discount'
     }
   end
 end
@@ -220,6 +233,7 @@ $stdin.readlines.each do |line|
         replacements[wikilink] = "[#{label}](obsidian://vault/#{vault}/#{ERB::Util.url_encode("#{link}#{anchor}")})"
       end
 
+      # Replace solitary anchors with appropriately-formatted anchor links based on Marked processor
       line.scan(/\[(?<label>.*?)\]\(#(?<anchor>.*?)\)/) do
         m = Regexp.last_match
         wikilink = m[0]

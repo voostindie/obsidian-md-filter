@@ -56,7 +56,7 @@ Your mileage may vary though.
 
 ## Settings
 
-The filter can be configured per-vault by putting a file `.obsidian-md-filter` in the root of the vault. This must be a YAML file. Currently it supports five settings:
+The filter can be configured per-vault by putting a file `.obsidian-md-filter` in the root of the vault. This must be a YAML file. Currently it supports the following settings:
 
 ```yaml
 strip_emojis: true
@@ -64,6 +64,7 @@ add_title: true
 convert_tags: true
 obsidian_links: true
 convert_markdown_links: true
+marked_processor: discount
 ```
 
 - `strip_emojis`: remove emojis in the preview
@@ -71,3 +72,4 @@ convert_markdown_links: true
 - `convert_tags`: convert `#tags` to styled tags in preview
 - `obsidian_links`: if true, links in the document are converted to `obsidian://` urls and will open the linked notes in Obsidian
 - `convert_markdown_links`: if true, links created in the "portable" format (`[label](link)`) will be converted to `obsidian://` links. Only use this if you don't have `[[wikilinks]]` as your default link type
+- `marked_processor`: can be set to `mmd` or `multimarkdown` to remove spaces from the slug (#My anchor => Myanchor), which is compatible with the way MultiMarkdown creates anchors from headlines. Any other value will generate anchors as hyphenated slugs (#My anchor => my-anchor).
