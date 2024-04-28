@@ -216,9 +216,9 @@ $stdin.readlines.each do |line|
     # Style #tags (settings['convert_tags'])
     if Vault.instance.convert_tags?
       if Vault.instance.obsidian_links?
-        line.gsub!(/(?<=\A|\s)#(\S+)/, "<span class=\"mkstyledtag\"><a href=\"obsidian://search?vault=#{vault}&query=tag%3A\\1\">#\\1</a></span>")
+        line.gsub!(/(?<=\A|\s)#([^# ]+)/, "<span class=\"mkstyledtag\"><a href=\"obsidian://search?vault=#{vault}&query=tag%3A\\1\">#\\1</a></span>")
       else
-        line.gsub!(/(?<=\A|\s)#(\S+)/, '<span class="mkstyledtag">#\1</span>')
+        line.gsub!(/(?<=\A|\s)#([^# ]+)/, '<span class="mkstyledtag">#\1</span>')
       end
     end
     # Fix all [[WikiLinks]]
