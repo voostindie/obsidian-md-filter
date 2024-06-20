@@ -214,7 +214,13 @@ $stdin.readlines.each do |line|
     # Remove emojis if needed
     line.gsub!(EMOJI_REGEX, '') if Vault.instance.strip_emojis?
     # Style #tags (settings['convert_tags'])
-    line.gsub!(/(?<=\A|\s)#(\S+)/, '<span class="mkstyledtag">#\1</span>') if Vault.instance.convert_tags?
+    if Vault.instance.convert_tags?
+      if Vault.instance.obsidian_links?
+        line.gsub!(/(?<=\A|\s)#([^# ]+)/, "<span class=\"mkstyledtag\"><a href=\"obsidian://search?vault=#{vault}&query=tag%3A\\1\">#\\1</a></span>")
+      else
+        line.gsub!(/(?<=\A|\s)#([^# ]+)/, '<span class="mkstyledtag">#\1</span>')
+      end
+    end
     # Fix all [[WikiLinks]]
     replacements = if Vault.instance.obsidian_links?
                      obsidian_links(line, vault)
