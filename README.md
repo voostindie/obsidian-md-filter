@@ -1,5 +1,13 @@
 # Obsidian Markdown Filter
 
+## Project archived!
+
+As of October 20, 2026, this project is archived. I wrote a new filter for Marked, the [Markdown Curator Filter](https://github.com/voostindie/marked-markdown-curator-filter), which is a simple zsh script that delegates the filtering work to the embedded HTTP server of my [Markdown Curator](https://github.com/voostindie/markdown-curator).
+
+With that, I have one project and one language (Java) to maintain the logic that turns Markdown into other things, like vanilla Markdown without any wikilinks.
+
+<hr/>
+
 ## Introduction
 
 Takes an [Obsidian](https://obsidian.md) Markdown file and processes it for viewing in [Marked 2](https://marked2app.com). Set this script as a custom preprocessor in Marked 2 to make it work:
