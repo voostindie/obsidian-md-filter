@@ -124,25 +124,25 @@ $stdin.readlines.each do |line|
     line.scan(/(\[\[(.*?)\]\])/) do |match|
       wikilink = match[0]
       text = match[1]
-      link, label = text.split('|')
-      page, anchor = link.split('#')
+      link, label = text.split('|') unless text.nil?
+      page, anchor = link.split('#') unless link.nil?
       replacements[wikilink] = if !label.nil?
                                  # [[Internal link|Alias]] -> Alias
-                                 label
+                                 label.strip
                                elsif !anchor.nil?
                                  if page.empty?
                                    # [[#Reference]] -> Reference
-                                   anchor
+                                   anchor.strip
                                  else
                                    # [[Internal link#Reference]] -> Internal link > Reference
-                                   "#{page} > #{anchor}"
+                                   "#{page.strip} > #{anchor.strip}"
                                  end
                                else
                                  # [[Internal link]] -> Internal link
-                                 page
+                                 text.strip
                                end
     end
-    replacements.each_pair { |k, v| line.gsub!(k, v) }
-    puts line
+	replacements.each_pair { |k, v| line.gsub!(k, v) unless v.nil? }
+	puts line
   end
 end
